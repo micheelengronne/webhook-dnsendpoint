@@ -51,7 +51,7 @@ jobs:
         env:
           DOCKER_METADATA_ANNOTATIONS_LEVELS: manifest,index
         with:
-          images: ghcr.io/${{ github.repository_owner }}/webhook-dnsendpoint/images
+          images: ghcr.io/${{ github.repository_owner }}/images/webhook-dnsendpoint
           tags: |
             type=ref,event=branch,suffix=-${{ matrix.platform }}
             type=ref,event=pr,suffix=-${{ matrix.platform }}
@@ -62,7 +62,7 @@ jobs:
         id: build-type
         run: |
           if [ "${{ github.event_name }}" = "release" ]; then
-            echo "type=type=image,name=ghcr.io/${{ github.repository_owner }}/webhook-dnsendpoint,push-by-digest=true,name-canonical=true,push=true" >> $GITHUB_OUTPUT
+            echo "type=type=image,name=ghcr.io/${{ github.repository_owner }}/images/webhook-dnsendpoint,push-by-digest=true,name-canonical=true,push=true" >> $GITHUB_OUTPUT
           else
             echo "type=type=docker" >> $GITHUB_OUTPUT
           fi
@@ -78,7 +78,7 @@ jobs:
             TARGETPLATFORM=${{ matrix.platform }}
           labels: |
             org.opencontainers.image.title=webhook-dnsendpoint
-            org.opencontainers.image.url=https://ghcr.io/${{ github.repository_owner }}/webhook-dnsendpoint/images
+            org.opencontainers.image.url=https://ghcr.io/${{ github.repository_owner }}/images/webhook-dnsendpoint
             org.opencontainers.image.version=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.version'] }}
             org.opencontainers.image.revision=${{ github.sha }}
             org.opencontainers.image.vendor=${{ github.repository_owner }}
@@ -114,7 +114,7 @@ jobs:
         env:
           DOCKER_METADATA_ANNOTATIONS_LEVELS: manifest,index
         with:
-          images: ghcr.io/${{ github.repository_owner }}/webhook-dnsendpoint/images
+          images: ghcr.io/${{ github.repository_owner }}/images/webhook-dnsendpoint
           tags: |
             type=ref,event=branch
             type=ref,event=pr
@@ -127,6 +127,6 @@ jobs:
         with:
           tags: ${{ join(fromJSON(steps.meta.outputs.json).tags, ',') }}
           inputs: >-
-            ghcr.io/${{ github.repository_owner }}/webhook-dnsendpoint/images@${{ needs.build.outputs.arm64 }},
-            ghcr.io/${{ github.repository_owner }}/webhook-dnsendpoint/images@${{ needs.build.outputs.amd64 }}
+            ghcr.io/${{ github.repository_owner }}/images/webhook-dnsendpoint@${{ needs.build.outputs.arm64 }},
+            ghcr.io/${{ github.repository_owner }}/images/webhook-dnsendpoint@${{ needs.build.outputs.amd64 }}
           push: false
