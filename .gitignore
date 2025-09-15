@@ -17,3 +17,4 @@ cert-manager-webhook-dnsendpoint
 # Make artifacts
 _out
 _test
+_integration

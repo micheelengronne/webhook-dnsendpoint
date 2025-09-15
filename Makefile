@@ -39,7 +39,7 @@ $(OUT)/rendered-manifest.yaml: $(HELM_FILES) | $(OUT)
 	    dnsendpoint-webhook \
             --set image.repository=$(IMAGE_NAME) \
             --set image.tag=$(IMAGE_TAG) \
-            deploy/dnsendpoint-webhook > $@
+            charts/dnsendpoint-webhook > $@
 
 _test $(OUT) _test/kubebuilder-$(KUBEBUILDER_VERSION)-$(OS)-$(ARCH):
 	mkdir -p $@
