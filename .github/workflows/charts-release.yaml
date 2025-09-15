@@ -63,7 +63,7 @@ jobs:
       - name: Package Helm Charts
         shell: bash
         env:
-          SRC_DIR: "src/charts"
+          SRC_DIR: "charts"
           DEST_DIR: "dest"
           REGISTRY: oci://ghcr.io/${{ github.repository_owner }}/charts
         run: |
