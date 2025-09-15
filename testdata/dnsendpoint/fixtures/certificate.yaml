@@ -1,0 +1,12 @@
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: test-dnsendpoint
+spec:
+  secretName: test-dnsendpoint
+  duration: 1h
+  issuerRef:
+    name: dnsendpoint-issuer
+  dnsNames:
+  - test.michee.io

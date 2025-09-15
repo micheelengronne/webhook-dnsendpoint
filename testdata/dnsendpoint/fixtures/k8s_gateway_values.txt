@@ -1,0 +1,10 @@
+---
+domain: michee.io
+service:
+    type: NodePort
+    nodePort: 30053
+    useTcp: true
+debug:
+    enabled: true
+watchedResources:
+  - DNSEndpoint

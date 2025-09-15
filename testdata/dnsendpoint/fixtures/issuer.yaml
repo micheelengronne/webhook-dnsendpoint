@@ -1,0 +1,19 @@
+---
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: dnsendpoint-issuer
+spec:
+  acme:
+    privateKeySecretRef:
+      name: dnsendpoint-acme-key
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    email: blackhole@michee.io
+    solvers:
+    - selector:
+        dnsZones:
+        - 'michee.io'
+      dns01:
+        webhook:
+          groupName: acme.michee.io
+          solverName: dnsendpoint-webhook
