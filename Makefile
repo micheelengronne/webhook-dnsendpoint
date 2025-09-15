@@ -9,7 +9,7 @@ OUT := $(shell pwd)/_out
 
 KUBEBUILDER_VERSION=1.30.0
 
-HELM_FILES := $(shell find deploy/dnsendpoint-webhook)
+HELM_FILES := $(shell find charts/dnsendpoint-webhook)
 
 test: _test/kubebuilder-$(KUBEBUILDER_VERSION)-$(OS)-$(ARCH)/etcd _test/kubebuilder-$(KUBEBUILDER_VERSION)-$(OS)-$(ARCH)/kube-apiserver _test/kubebuilder-$(KUBEBUILDER_VERSION)-$(OS)-$(ARCH)/kubectl
 	TEST_ASSET_ETCD=_test/kubebuilder-$(KUBEBUILDER_VERSION)-$(OS)-$(ARCH)/etcd \
