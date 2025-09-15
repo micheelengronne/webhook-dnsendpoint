@@ -18,6 +18,10 @@ on:
     paths:
       - "charts/**"
 
+permissions:
+  contents: read
+  packages: write
+
 env:
   HELM_VERSION: 3.17.2
 
