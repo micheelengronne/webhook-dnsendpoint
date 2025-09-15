@@ -15,8 +15,8 @@ certManager:
   serviceAccountName: cert-manager
 
 image:
-  repository: ghcr.io/micheelengronne/webhook-dnsendpoint
-  tag: 0.1.0
+  repository: ghcr.io/micheelengronne/webhook-dnsendpoint/images
+  tag: 0.1.1
   pullPolicy: IfNotPresent
 
 nameOverride: ""
