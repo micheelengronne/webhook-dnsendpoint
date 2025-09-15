@@ -43,6 +43,7 @@ jobs:
 
   release-charts:
     name: Release charts
+    needs: prepare
     runs-on: ubuntu-latest
     steps:
       - name: Login to GitHub Container Registry
@@ -66,7 +67,7 @@ jobs:
           DEST_DIR: "dest"
           REGISTRY: oci://ghcr.io/${{ github.repository_owner }}/charts
         run: |
-          CHARTS=( $(yq --null-input e '${{ inputs.charts }}[]' ) )
+          CHARTS=( $(yq --null-input e '${{ needs.prepare.outputs.charts-to-release }}[]' ) )
 
           for CHART in "${CHARTS[@]}" ; do
             mapfile -t CHART_PATH_PARTS < <(echo "$CHART" | tr '/' '\n')
@@ -77,6 +78,3 @@ jobs:
             helm package "${SRC_DIR}/${CHART}" -u -d "${DEST_DIR}"
             helm push "${DEST_DIR}/${CHART}-${VERSION}.tgz" "${REGISTRY}"
           done
-
-    with:
-      charts: "${{ needs.prepare.outputs.charts-to-release }}"
