@@ -1,0 +1,132 @@
+name: Docker release
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - main.go
+      - go.*
+      - Dockerfile
+    tags:
+      - "*"
+  pull_request:
+    branches: [master]
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build:
+    name: Build (${{ matrix.platform }})
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      matrix:
+        include:
+          - platform: amd64
+            runner: ubuntu-24.04
+          - platform: arm64
+            runner: ubuntu-24.04-arm
+    outputs:
+      amd64: ${{ steps.digest.outputs.amd64 }}
+      arm64: ${{ steps.digest.outputs.arm64 }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@184bdaa0721073962dff0199f1fb9940f07167d1 # v3.5.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Meta
+        uses: docker/metadata-action@c1e51972afc2121e065aed6d45c65596fe445f3f # v5.8.0
+        id: meta
+        env:
+          DOCKER_METADATA_ANNOTATIONS_LEVELS: manifest,index
+        with:
+          images: ghcr.io/${{ github.repository_owner }}/webhook-dnsendpoint
+          tags: |
+            type=ref,event=branch,suffix=-${{ matrix.platform }}
+            type=ref,event=pr,suffix=-${{ matrix.platform }}
+            type=semver,pattern={{version}},suffix=-${{ matrix.platform }}
+            type=semver,pattern={{major}}.{{minor}},suffix=-${{ matrix.platform }}
+
+      - name: Set output type
+        id: build-type
+        run: |
+          if [ "${{ github.event_name }}" = "release" ]; then
+            echo "type=type=image,name=ghcr.io/${{ github.repository_owner }}/webhook-dnsendpoint,push-by-digest=true,name-canonical=true,push=true" >> $GITHUB_OUTPUT
+          else
+            echo "type=type=docker" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build Image
+        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
+        id: build
+        with:
+          build-args: |
+            VENDOR=${{ github.repository_owner }}
+            VERSION=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.version'] }}
+            REVISION=${{ github.sha }}
+            TARGETPLATFORM=${{ matrix.platform }}
+          labels: |
+            org.opencontainers.image.title=webhook-dnsendpoint
+            org.opencontainers.image.url=https://ghcr.io/${{ github.repository_owner }}/webhook-dnsendpoint
+            org.opencontainers.image.version=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.version'] }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.vendor=${{ github.repository_owner }}
+          outputs: ${{ steps.build-type.outputs.type }}
+          context: .
+          platforms: linux/${{ matrix.platform }}
+          provenance: false
+
+      - name: Export Digest
+        id: digest
+        run: |
+          echo "${{ matrix.platform }}=${{ steps.build.outputs.digest }}" >> "${GITHUB_OUTPUT}"
+
+  release:
+    if: ${{ github.event_name == 'release' }}
+    needs: build
+    name: Release
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@184bdaa0721073962dff0199f1fb9940f07167d1 # v3.5.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build Meta
+        uses: docker/metadata-action@c1e51972afc2121e065aed6d45c65596fe445f3f # v5.8.0
+        id: meta
+        env:
+          DOCKER_METADATA_ANNOTATIONS_LEVELS: manifest,index
+        with:
+          images: ghcr.io/${{ github.repository_owner }}/webhook-dnsendpoint
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+
+      - name: Push Images
+        id: push
+        uses: Noelware/docker-manifest-action@v1
+        with:
+          tags: ${{ join(fromJSON(steps.meta.outputs.json).tags, ',') }}
+          inputs: >-
+            ghcr.io/${{ github.repository_owner }}/webhook-dnsendpoint@${{ needs.build.outputs.arm64 }},
+            ghcr.io/${{ github.repository_owner }}/webhook-dnsendpoint@${{ needs.build.outputs.amd64 }}
+          push: false
