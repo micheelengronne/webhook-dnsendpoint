@@ -2,7 +2,7 @@ name: Docker release
 
 on:
   push:
-    branches: [master]
+    branches: [main]
     paths:
       - main.go
       - go.*
@@ -10,7 +10,7 @@ on:
     tags:
       - "*"
   pull_request:
-    branches: [master]
+    branches: [main]
   release:
     types: [published]
 
