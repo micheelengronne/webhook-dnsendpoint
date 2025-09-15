@@ -7,7 +7,8 @@ This project brings support for the dnsendpoint CRD to cert-manager webhook.
 
 ## Requirements
 
-* dnsendpoint CRD with TXT support.
+* cert-manager obviously
+* dnsendpoint CRD with TXT support
 
 ## Tests
 
