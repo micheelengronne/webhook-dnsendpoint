@@ -16,4 +16,4 @@ Tests are not done by the official `main_test.go` suite but rather through an in
 The reason is that the official suite didn't support a separate `setup` func for the `NewFixture` which would have been necessary to wait for the
 [k8s_gateway](https://github.com/k8s-gateway/k8s_gateway) pod to spin up and start serving DNs.
 
-Check the tests [README](./testdata/README.md) on how to run it.
+Check the tests [README](./testdata/dnsendpoint/README.md) on how to run it.
