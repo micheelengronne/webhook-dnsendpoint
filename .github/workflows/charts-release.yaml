@@ -72,6 +72,11 @@ jobs:
           for CHART in "${CHARTS[@]}" ; do
             mapfile -t CHART_PATH_PARTS < <(echo "$CHART" | tr '/' '\n')
 
+            echo "Debug SRC_DIR"
+            ls "${SRC_DIR}"
+            echo "Debug Chart DIR"
+            ls "${SRC_DIR}/${CHART}"
+
             export VERSION=$(yq .version "${SRC_DIR}/${CHART}/Chart.yaml")
 
             helm dep up "${SRC_DIR}/${CHART}"
