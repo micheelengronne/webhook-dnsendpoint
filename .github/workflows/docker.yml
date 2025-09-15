@@ -51,7 +51,7 @@ jobs:
         env:
           DOCKER_METADATA_ANNOTATIONS_LEVELS: manifest,index
         with:
-          images: ghcr.io/${{ github.repository_owner }}/webhook-dnsendpoint
+          images: ghcr.io/${{ github.repository_owner }}/webhook-dnsendpoint/images
           tags: |
             type=ref,event=branch,suffix=-${{ matrix.platform }}
             type=ref,event=pr,suffix=-${{ matrix.platform }}
