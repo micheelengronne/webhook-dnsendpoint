@@ -1,26 +1,26 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "dnsendpoint-webhook.fullname" . }}
+  name: {{ include "webhook-dnsendpoint.fullname" . }}
   namespace: {{ .Release.Namespace | quote }}
   labels:
-    app: {{ include "dnsendpoint-webhook.name" . }}
-    chart: {{ include "dnsendpoint-webhook.chart" . }}
+    app: {{ include "webhook-dnsendpoint.name" . }}
+    chart: {{ include "webhook-dnsendpoint.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app: {{ include "dnsendpoint-webhook.name" . }}
+      app: {{ include "webhook-dnsendpoint.name" . }}
       release: {{ .Release.Name }}
   template:
     metadata:
       labels:
-        app: {{ include "dnsendpoint-webhook.name" . }}
+        app: {{ include "webhook-dnsendpoint.name" . }}
         release: {{ .Release.Name }}
     spec:
-      serviceAccountName: {{ include "dnsendpoint-webhook.fullname" . }}
+      serviceAccountName: {{ include "webhook-dnsendpoint.fullname" . }}
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
@@ -54,7 +54,7 @@ spec:
       volumes:
         - name: certs
           secret:
-            secretName: {{ include "dnsendpoint-webhook.servingCertificate" . }}
+            secretName: {{ include "webhook-dnsendpoint.servingCertificate" . }}
     {{- with .Values.nodeSelector }}
       nodeSelector:
 {{ toYaml . | indent 8 }}

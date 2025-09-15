@@ -9,7 +9,7 @@ on:
         description: >
           Charts to release. Comma-separated string.
           Defaults to releasing everything.
-        default: "dnsendpoint-webhook"
+        default: "webhook-dnsendpoint"
         required: false
 
   push:

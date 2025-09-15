@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: {{ include "dnsendpoint-webhook.fullname" . }}
+  name: {{ include "webhook-dnsendpoint.fullname" . }}
   namespace: {{ .Release.Namespace | quote }}
   labels:
-    app: {{ include "dnsendpoint-webhook.name" . }}
-    chart: {{ include "dnsendpoint-webhook.chart" . }}
+    app: {{ include "webhook-dnsendpoint.name" . }}
+    chart: {{ include "webhook-dnsendpoint.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 ---
@@ -15,11 +15,11 @@ metadata:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: {{ include "dnsendpoint-webhook.fullname" . }}:webhook-authentication-reader
+  name: {{ include "webhook-dnsendpoint.fullname" . }}:webhook-authentication-reader
   namespace: kube-system
   labels:
-    app: {{ include "dnsendpoint-webhook.name" . }}
-    chart: {{ include "dnsendpoint-webhook.chart" . }}
+    app: {{ include "webhook-dnsendpoint.name" . }}
+    chart: {{ include "webhook-dnsendpoint.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 roleRef:
@@ -29,7 +29,7 @@ roleRef:
 subjects:
   - apiGroup: ""
     kind: ServiceAccount
-    name: {{ include "dnsendpoint-webhook.fullname" . }}
+    name: {{ include "webhook-dnsendpoint.fullname" . }}
     namespace: {{ .Release.Namespace }}
 ---
 # apiserver gets the auth-delegator role to delegate auth decisions to
@@ -37,10 +37,10 @@ subjects:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: {{ include "dnsendpoint-webhook.fullname" . }}:auth-delegator
+  name: {{ include "webhook-dnsendpoint.fullname" . }}:auth-delegator
   labels:
-    app: {{ include "dnsendpoint-webhook.name" . }}
-    chart: {{ include "dnsendpoint-webhook.chart" . }}
+    app: {{ include "webhook-dnsendpoint.name" . }}
+    chart: {{ include "webhook-dnsendpoint.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 roleRef:
@@ -50,17 +50,17 @@ roleRef:
 subjects:
   - apiGroup: ""
     kind: ServiceAccount
-    name: {{ include "dnsendpoint-webhook.fullname" . }}
+    name: {{ include "webhook-dnsendpoint.fullname" . }}
     namespace: {{ .Release.Namespace }}
 ---
 # Grant cert-manager permission to validate using our apiserver
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: {{ include "dnsendpoint-webhook.fullname" . }}:domain-solver
+  name: {{ include "webhook-dnsendpoint.fullname" . }}:domain-solver
   labels:
-    app: {{ include "dnsendpoint-webhook.name" . }}
-    chart: {{ include "dnsendpoint-webhook.chart" . }}
+    app: {{ include "webhook-dnsendpoint.name" . }}
+    chart: {{ include "webhook-dnsendpoint.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 rules:
@@ -74,30 +74,30 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: {{ include "dnsendpoint-webhook.fullname" . }}:domain-solver
+  name: {{ include "webhook-dnsendpoint.fullname" . }}:domain-solver
   labels:
-    app: {{ include "dnsendpoint-webhook.name" . }}
-    chart: {{ include "dnsendpoint-webhook.chart" . }}
+    app: {{ include "webhook-dnsendpoint.name" . }}
+    chart: {{ include "webhook-dnsendpoint.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: {{ include "dnsendpoint-webhook.fullname" . }}:domain-solver
+  name: {{ include "webhook-dnsendpoint.fullname" . }}:domain-solver
 subjects:
   - apiGroup: ""
     kind: ServiceAccount
     name: {{ .Values.certManager.serviceAccountName }}
     namespace: {{ .Values.certManager.namespace }}
 ---
-# Grant dnsendpoint-webhook permission to create dnsendpoints
+# Grant webhook-dnsendpoint permission to create dnsendpoints
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: {{ include "dnsendpoint-webhook.fullname" . }}:dnsendpoint-webhook
+  name: {{ include "webhook-dnsendpoint.fullname" . }}:webhook-dnsendpoint
   labels:
-    app: {{ include "dnsendpoint-webhook.name" . }}
-    chart: {{ include "dnsendpoint-webhook.chart" . }}
+    app: {{ include "webhook-dnsendpoint.name" . }}
+    chart: {{ include "webhook-dnsendpoint.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 rules:
@@ -112,18 +112,18 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: {{ include "dnsendpoint-webhook.fullname" . }}:dnsendpoint-webhook
+  name: {{ include "webhook-dnsendpoint.fullname" . }}:webhook-dnsendpoint
   labels:
-    app: {{ include "dnsendpoint-webhook.name" . }}
-    chart: {{ include "dnsendpoint-webhook.chart" . }}
+    app: {{ include "webhook-dnsendpoint.name" . }}
+    chart: {{ include "webhook-dnsendpoint.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: {{ include "dnsendpoint-webhook.fullname" . }}:dnsendpoint-webhook
+  name: {{ include "webhook-dnsendpoint.fullname" . }}:webhook-dnsendpoint
 subjects:
   - apiGroup: ""
     kind: ServiceAccount
-    name: {{ include "dnsendpoint-webhook.fullname" . }}
+    name: {{ include "webhook-dnsendpoint.fullname" . }}
     namespace: {{ .Release.Namespace }}

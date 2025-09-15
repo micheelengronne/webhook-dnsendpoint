@@ -49,7 +49,7 @@ type endpointDNSProviderConfig struct {
 }
 
 func (e *endpointDNSProviderSolver) Name() string {
-	return "dnsendpoint-webhook"
+	return "webhook-dnsendpoint"
 }
 
 func (e *endpointDNSProviderSolver) Present(ch *v1alpha1.ChallengeRequest) error {

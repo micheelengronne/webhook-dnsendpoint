@@ -16,4 +16,4 @@ spec:
       dns01:
         webhook:
           groupName: acme.michee.io
-          solverName: dnsendpoint-webhook
+          solverName: webhook-dnsendpoint
