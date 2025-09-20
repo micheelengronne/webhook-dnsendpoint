@@ -4,14 +4,6 @@ concurrency: helm-release
 
 on:
   workflow_dispatch:
-    inputs:
-      charts:
-        description: >
-          Charts to release. Comma-separated string.
-          Defaults to releasing everything.
-        default: "webhook-dnsendpoint"
-        required: false
-
   push:
     branches:
       - main
@@ -26,28 +18,8 @@ env:
   HELM_VERSION: 3.17.2
 
 jobs:
-  prepare:
-    name: Prepare data required for release
-    #runs-on: ["self-hosted", "X64"]
-    runs-on: ubuntu-latest
-    outputs:
-      charts-to-release: ${{ steps.collect-charts.outputs.charts }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v5
-        with:
-          fetch-depth: 0
-
-      - name: Collect charts to release
-        uses: bjw-s-labs/helm-charts-actions/collect-charts@2025.2.0
-        id: collect-charts
-        with:
-          repoConfigFile: ./.ci/repo-config.yaml
-          overrideCharts: "[${{ inputs.charts }}]"
-
   release-charts:
-    name: Release charts
-    needs: prepare
+    name: Release chart
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -71,16 +43,11 @@ jobs:
         env:
           SRC_DIR: "charts"
           DEST_DIR: "dest"
+          CHART: "webhook-dnsendpoint"
           REGISTRY: oci://ghcr.io/${{ github.repository_owner }}/charts
         run: |
-          CHARTS=( $(yq --null-input e '${{ needs.prepare.outputs.charts-to-release }}[]' ) )
+          export VERSION=$(yq .version "${SRC_DIR}/${CHART}/Chart.yaml")
 
-          for CHART in "${CHARTS[@]}" ; do
-            mapfile -t CHART_PATH_PARTS < <(echo "$CHART" | tr '/' '\n')
-
-            export VERSION=$(yq .version "${SRC_DIR}/${CHART}/Chart.yaml")
-
-            helm dep up "${SRC_DIR}/${CHART}"
-            helm package "${SRC_DIR}/${CHART}" -u -d "${DEST_DIR}"
-            helm push "${DEST_DIR}/${CHART}-${VERSION}.tgz" "${REGISTRY}"
-          done
+          helm dep up "${SRC_DIR}/${CHART}"
+          helm package "${SRC_DIR}/${CHART}" -u -d "${DEST_DIR}"
+          helm push "${DEST_DIR}/${CHART}-${VERSION}.tgz" "${REGISTRY}"
