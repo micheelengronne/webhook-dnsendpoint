@@ -13,9 +13,7 @@ metadata:
     heritage: {{ .Release.Service }}
 spec:
   selfSigned: {}
-
 ---
-
 # Generate a CA Certificate used to sign certificates for the webhook
 apiVersion: cert-manager.io/v1
 kind: Certificate
@@ -29,14 +27,12 @@ metadata:
     heritage: {{ .Release.Service }}
 spec:
   secretName: {{ include "webhook-dnsendpoint.rootCACertificate" . }}
-  duration: 43800h # 5y
+  duration: {{ .Values.pki.ca.duration }}
   issuerRef:
     name: {{ include "webhook-dnsendpoint.selfSignedIssuer" . }}
   commonName: "ca.webhook-dnsendpoint.cert-manager"
   isCA: true
-
 ---
-
 # Create an Issuer that uses the above generated CA certificate to issue certs
 apiVersion: cert-manager.io/v1
 kind: Issuer
@@ -51,9 +47,7 @@ metadata:
 spec:
   ca:
     secretName: {{ include "webhook-dnsendpoint.rootCACertificate" . }}
-
 ---
-
 # Finally, generate a serving certificate for the webhook to use
 apiVersion: cert-manager.io/v1
 kind: Certificate
@@ -67,7 +61,6 @@ metadata:
     heritage: {{ .Release.Service }}
 spec:
   secretName: {{ include "webhook-dnsendpoint.servingCertificate" . }}
-  duration: 8760h # 1y
   issuerRef:
     name: {{ include "webhook-dnsendpoint.rootCAIssuer" . }}
   dnsNames:
